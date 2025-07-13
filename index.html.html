@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마인드셋 자가진단 설문</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Noto Sans KR', Arial, sans-serif;
+            background: linear-gradient(135deg, #24278B 0%, #1e2177 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #24278B 0%, #1e2177 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        .survey-container {
+            padding: 40px;
+        }
+        .welcome-screen {
+            text-align: center;
+        }
+        .welcome-screen h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+        .welcome-screen p {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        .name-input-container {
+            margin: 30px 0;
+        }
+        .name-input-container label {
+            display: block;
+            margin-bottom: 10px;
+            color: #333;
+            font-weight: 600;
+        }
+        .name-input-container input {
+            width: 100%;
+            max-width: 300px;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+        .name-input-container input:focus {
+            outline: none;
+            border-color: #24278B;
+        }
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #24278B 0%, #1e2177 100%);
+            color: white;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(36, 39, 139, 0.3);
+        }
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #666;
+            border: 2px solid #e1e5e9;
+        }
+        .btn-secondary:hover {
+            background: #e9ecef;
+            border-color: #ced4da;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        .question-container {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .progress-bar {
+            background: #e1e5e9;
+            height: 8px;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            background: linear-gradient(135deg, #24278B 0%, #1e2177 100%);
+            height: 100%;
+            transition: width 0.5s ease;
+            border-radius: 4px;
+            width: 0%;
+        }
+        .question {
+            margin-bottom: 40px;
+        }
+        .question-header {
+            background: #f8f9ff;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border-left: 5px solid #24278B;
+        }
+        .question-number {
+            color: #24278B;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+        .question-text {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        .question-scenario {
+            font-size: 1rem;
+            color: #666;
+            font-style: italic;
+            line-height: 1.5;
+        }
+        .options {
+            display: grid;
+            gap: 15px;
+        }
+        .option {
+            background: white;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .option:hover {
+            border-color: #24278B;
+            background: #f8f9ff;
+            transform: translateX(5px);
+        }
+        .option.selected {
+            border-color: #24278B;
+            background: linear-gradient(135deg, #24278B 0%, #1e2177 100%);
+            color: white;
+            transform: translateX(5px);
+        }
+        .option-label {
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+        .option-text {
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #e1e5e9;
+        }
+        .result-container {
+            display: none;
+            text-align: center;
+            animation: fadeIn 0.5s ease-in;
+        }
+        .result-score {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #24278B;
+            margin-bottom: 20px;
+        }
+        .result-category {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+        .result-description {
+            background: #f8f9ff;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: left;
+            margin-bottom: 30px;
+            border-left: 5px solid #24278B;
+        }
+        .result-description h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        .result-description p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        .result-tips {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .result-tips h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        .result-tips ul {
+            color: #856404;
+            margin-left: 20px;
+        }
+        .result-tips li {
+            margin-bottom: 5px;
+        }
+        .aggregate-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 15px;
+            border-left: 5px solid #24278B;
+        }
+        .aggregate-section h3 {
+            color: #24278B;
+            margin-bottom: 15px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #24278B;
+        }
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+        .distribution-chart {
+            margin-top: 20px;
+        }
+        .chart-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .chart-label {
+            width: 120px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        .chart-bar-fill {
+            height: 20px;
+            background: linear-gradient(135deg, #24278B 0%, #1e2177 100%);
+            border-radius: 10px;
+            margin-right: 10px;
+            transition: width 0.5s ease;
+        }
+        .chart-value {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #24278B;
+        }
+        .instructor-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        .instructor-toggle {
+            background: #24278B;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 12px rgba(36, 39, 139, 0.3);
+        }
+        .instructor-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1001;
+        }
+        .modal-content {
+            background: white;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .close-modal {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #aaa;
+        }
+        .close-modal:hover {
+            color: #000;
+        }
+        .participant-list {
+            margin-top: 20px;
+        }
+        .participant-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #24278B;
+        }
+        .participant-name {
+            font-weight: 600;
+            color: #333;
+        }
+        .participant-score {
+            color: #24278B;
+            font-weight: bold;
+        }
+        .participant-level {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            .survey-container {
+                padding: 20px;
+            }
+            .controls {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .btn {
+                width: 100%;
+            }
+            .modal-content {
+                margin: 20px;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧠 마인드셋 자가진단</h1>
+            <p>나의 성장 마인드셋과 고정 마인드셋 경향을 알아보세요</p>
+        </div>
+
+        <div class="survey-container">
+            <div class="welcome-screen" id="welcomeScreen">
+                <h2>📝 설문 안내</h2>
+                <p>이 설문은 캐럴 드웩(Carol Dweck)의 마인드셋 이론을 바탕으로 제작되었습니다.</p>
+                <p>총 20개의 질문을 통해 현재 당신의 마인드셋 경향을 파악할 수 있습니다.</p>
+                <p><strong>예상 소요시간: 약 5-7분</strong></p>
+                <p>각 상황에서 가장 솔직하게 느끼는 바를 선택해주세요.</p>
+                
+                <div class="name-input-container">
+                    <label for="participantName">이름을 입력해주세요:</label>
+                    <input type="text" id="participantName" placeholder="홍길동" required>
+                </div>
+                
+                <button class="btn" onclick="startSurvey()">설문 시작하기</button>
+            </div>
+
+            <div class="question-container" id="questionContainer">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                
+                <div class="question" id="questionElement">
+                </div>
+
+                <div class="controls">
+                    <button class="btn btn-secondary" id="prevBtn" onclick="previousQuestion()" disabled>이전</button>
+                    <button class="btn" id="nextBtn" onclick="nextQuestion()" disabled>다음</button>
+                </div>
+            </div>
+
+            <div class="result-container" id="resultContainer">
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-category" id="resultCategory"></div>
+                <div class="result-description" id="resultDescription"></div>
+                
+                <div class="aggregate-section" id="aggregateSection">
+                    <h3>📊 전체 참가자 결과</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalParticipants">0</div>
+                            <div class="stat-label">총 참가자</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="averageScore">0.0</div>
+                            <div class="stat-label">평균 점수</div>
+                        </div>
+                    </div>
+                    
+                    <div class="distribution-chart">
+                        <h4>마인드셋 분포</h4>
+                        <div id="distributionBars"></div>
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="restartSurvey()">다시 검사하기</button>
+            </div>
+        </div>
+        
+        <div class="instructor-panel" id="instructorPanel">
+            <button class="instructor-toggle" onclick="toggleInstructorModal()">👨‍🏫 강사용</button>
+        </div>
+        
+        <div class="instructor-modal" id="instructorModal">
+            <div class="modal-content">
+                <span class="close-modal" onclick="toggleInstructorModal()">&times;</span>
+                <h2>강사용 대시보드</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="modalTotalParticipants">0</div>
+                        <div class="stat-label">총 응답자</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="modalAverageScore">0.0</div>
+                        <div class="stat-label">평균 점수</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="modalHighestScore">0</div>
+                        <div class="stat-label">최고 점수</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="modalLowestScore">0</div>
+                        <div class="stat-label">최저 점수</div>
+                    </div>
+                </div>
+                
+                <div class="distribution-chart">
+                    <h4>상세 분포</h4>
+                    <div id="modalDistributionBars"></div>
+                </div>
+                
+                <div class="participant-list">
+                    <h4>개별 참가자 결과</h4>
+                    <div id="participantResults"></div>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <button class="btn" onclick="exportResults()">결과 내보내기</button>
+                    <button class="btn btn-secondary" onclick="clearAllData()">데이터 초기화</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 전역 변수
+        let currentQuestion = 0;
+        let answers = [];
+        let totalScore = 0;
+        let participantName = '';
+        let allResults = JSON.parse(localStorage.getItem('surveyResults') || '[]');
+
+        // 설문 데이터 (20개 질문)
+        const questions = [
+            {
+                category: "학습과 도전",
+                scenario: "회사에서 새로운 소프트웨어 도입으로 교육을 받아야 합니다.",
+                question: "새로운 기술을 배울 때 어떤 생각이 드나요?",
+                options: [
+                    { label: "A", text: "이런 상황이 스트레스로 느껴진다", score: 0 },
+                    { label: "B", text: "새로운 것을 배우는 것이 흥미롭다", score: 2 },
+                    { label: "C", text: "다른 사람들보다 늦게 배울까봐 걱정된다", score: 0 },
+                    { label: "D", text: "어려워도 시간을 들이면 익힐 수 있다고 생각한다", score: 2 }
+                ]
+            },
+            {
+                category: "학습과 도전",
+                scenario: "업무 중 전에 해본 적 없는 복잡한 문제가 생겼습니다.",
+                question: "복잡한 문제를 해결해야 할 때 어떻게 접근하나요?",
+                options: [
+                    { label: "A", text: "이런 문제는 경험 있는 사람이 해결해야 한다고 생각한다", score: 0 },
+                    { label: "B", text: "여러 방법을 시도해보며 해결책을 찾으려 한다", score: 2 },
+                    { label: "C", text: "빨리 해결하지 못하면 능력이 부족하다고 느낀다", score: 0 },
+                    { label: "D", text: "시간이 걸리더라도 배우면서 해결할 수 있다고 본다", score: 2 }
+                ]
+            },
+            {
+                category: "학습과 도전",
+                scenario: "분야 전문가가 당신의 현재 수준에 대해 솔직한 평가를 해주었습니다.",
+                question: "전문가의 피드백을 받을 때 어떻게 반응하나요?",
+                options: [
+                    { label: "A", text: "비판적인 피드백은 받아들이기 어렵다", score: 0 },
+                    { label: "B", text: "구체적인 개선 방향을 알려주면 도움이 된다", score: 2 },
+                    { label: "C", text: "평가 결과가 내 능력을 보여준다고 생각한다", score: 0 },
+                    { label: "D", text: "피드백을 통해 더 나아질 수 있다고 본다", score: 2 }
+                ]
+            },
+            {
+                category: "학습과 도전",
+                scenario: "관심은 있지만 완전히 새로운 분야의 책을 발견했습니다.",
+                question: "이 책을 보고 어떤 생각이 드나요?",
+                options: [
+                    { label: "A", text: "내 분야가 아니라서 굳이 읽을 필요는 없다고 생각한다", score: 0 },
+                    { label: "B", text: "새로운 지식을 얻을 수 있는 좋은 기회라고 생각한다", score: 2 },
+                    { label: "C", text: "읽어도 이해하지 못할 것 같아 망설여진다", score: 0 },
+                    { label: "D", text: "어려운 내용이라도 나의 시야를 넓혀줄 것이라고 믿는다", score: 2 }
+                ]
+            },
+            {
+                category: "실패와 좌절",
+                scenario: "몇 달간 준비한 중요한 프로젝트가 기대했던 결과를 얻지 못했습니다.",
+                question: "프로젝트가 실패했을 때 어떻게 생각하나요?",
+                options: [
+                    { label: "A", text: "내가 이런 일에 적합하지 않다고 생각한다", score: 0 },
+                    { label: "B", text: "다음번에는 다른 방법을 시도해보고 싶다", score: 2 },
+                    { label: "C", text: "실패한 것이 부끄럽고 다른 사람들이 어떻게 볼까 걱정된다", score: 0 },
+                    { label: "D", text: "실패에서 배운 것들이 다음에 도움이 될 것이다", score: 2 }
+                ]
+            },
+            {
+                category: "실패와 좌절",
+                scenario: "비슷한 실수를 또 하게 되었습니다.",
+                question: "반복되는 실수를 할 때 어떻게 반응하나요?",
+                options: [
+                    { label: "A", text: "나는 이런 부분에서 항상 실수한다", score: 0 },
+                    { label: "B", text: "실수를 방지할 수 있는 시스템을 만들어야겠다", score: 2 },
+                    { label: "C", text: "같은 실수를 반복하는 것이 창피하다", score: 0 },
+                    { label: "D", text: "실수를 통해 더 확실히 배울 수 있다", score: 2 }
+                ]
+            },
+            {
+                category: "실패와 좌절",
+                scenario: "올해 초에 세웠던 목표를 달성하지 못했습니다.",
+                question: "목표를 달성하지 못했을 때 어떻게 해석하나요?",
+                options: [
+                    { label: "A", text: "처음부터 내게는 무리한 목표였다", score: 0 },
+                    { label: "B", text: "목표 달성 방법을 다시 생각해봐야겠다", score: 2 },
+                    { label: "C", text: "목표를 달성하지 못한 것이 실망스럽다", score: 0 },
+                    { label: "D", text: "목표를 향해 노력한 과정에서 성장했다", score: 2 }
+                ]
+            },
+            {
+                category: "실패와 좌절",
+                scenario: "당신의 의견이 회의에서 받아들여지지 않았습니다.",
+                question: "이 상황에서 어떤 기분이 드나요?",
+                options: [
+                    { label: "A", text: "내 아이디어가 별로였다고 생각하며 위축된다", score: 0 },
+                    { label: "B", text: "내 의견의 어떤 점이 부족했는지 분석해본다", score: 2 },
+                    { label: "C", text: "다시는 의견을 내고 싶지 않다는 생각이 든다", score: 0 },
+                    { label: "D", text: "다른 사람들의 관점을 이해할 수 있는 기회였다고 생각한다", score: 2 }
+                ]
+            },
+            {
+                category: "성공과 칭찬",
+                scenario: "어려워 보였던 일을 예상보다 훨씬 잘 해냈습니다.",
+                question: "예상치 못한 성공을 거뒀을 때 어떻게 생각하나요?",
+                options: [
+                    { label: "A", text: "이번에는 운이 좋았다", score: 0 },
+                    { label: "B", text: "노력한 만큼 결과가 나왔다", score: 2 },
+                    { label: "C", text: "다음에도 이런 성과를 낼 수 있을지 걱정된다", score: 0 },
+                    { label: "D", text: "이런 성공이 더 큰 도전에 대한 자신감을 준다", score: 2 }
+                ]
+            },
+            {
+                category: "성공과 칭찬",
+                scenario: "동료가 당신을 보고 '정말 똑똑하다'고 말했습니다.",
+                question: "능력에 대한 칭찬을 받을 때 어떻게 받아들이나요?",
+                options: [
+                    { label: "A", text: "이런 칭찬을 들으면 기분이 좋다", score: 0 },
+                    { label: "B", text: "열심히 노력한 결과라고 생각한다", score: 2 },
+                    { label: "C", text: "앞으로도 이런 평가를 받을 수 있을지 부담스럽다", score: 0 },
+                    { label: "D", text: "칭찬이 더 열심히 하려는 동기가 된다", score: 2 }
+                ]
+            },
+            {
+                category: "성공과 칭찬",
+                scenario: "같이 시작한 동료들보다 빠르게 성과를 냈습니다.",
+                question: "빠른 성과를 낼 때 어떻게 해석하나요?",
+                options: [
+                    { label: "A", text: "나는 이런 일에 재능이 있는 것 같다", score: 0 },
+                    { label: "B", text: "사용한 방법이 효과적이었던 것 같다", score: 2 },
+                    { label: "C", text: "다른 사람들과 비교되는 것이 부담스럽다", score: 0 },
+                    { label: "D", text: "이 경험을 통해 더 어려운 일에도 도전하고 싶다", score: 2 }
+                ]
+            },
+            {
+                category: "성공과 칭찬",
+                scenario: "당신의 노력에 대해 상사가 공개적으로 칭찬했습니다.",
+                question: "노력에 대한 칭찬을 들었을 때 어떤 생각이 드나요?",
+                options: [
+                    { label: "A", text: "과분한 칭찬이라고 생각하며 겸손해진다", score: 0 },
+                    { label: "B", text: "나의 노력을 인정받은 것 같아 기쁘다", score: 2 },
+                    { label: "C", text: "사람들의 기대치가 높아질까봐 걱정된다", score: 0 },
+                    { label: "D", text: "앞으로도 꾸준히 노력해야겠다는 동기부여가 된다", score: 2 }
+                ]
+            },
+            {
+                category: "타인과의 비교",
+                scenario: "업계에서 인정받는 전문가와 함께 일하게 되었습니다.",
+                question: "뛰어난 실력자와 만났을 때 어떻게 느끼나요?",
+                options: [
+                    { label: "A", text: "실력 차이가 너무 커서 위축된다", score: 0 },
+                    { label: "B", text: "그 사람에게서 많은 것을 배우고 싶다", score: 2 },
+                    { label: "C", text: "내 부족함이 드러날까봐 걱정된다", score: 0 },
+                    { label: "D", text: "전문가와 일하면서 나도 성장할 수 있을 것이다", score: 2 }
+                ]
+            },
+            {
+                category: "타인과의 비교",
+                scenario: "늦게 시작한 후배가 빠르게 성장하고 있습니다.",
+                question: "후배가 빠르게 성장할 때 어떻게 반응하나요?",
+                options: [
+                    { label: "A", text: "나는 원래 배우는 속도가 느린 편이다", score: 0 },
+                    { label: "B", text: "그 후배의 학습 방법이 궁금하다", score: 2 },
+                    { label: "C", text: "후배에게 뒤처지는 것이 부끄럽다", score: 0 },
+                    { label: "D", text: "서로 자극을 주고받으며 함께 성장할 수 있다", score: 2 }
+                ]
+            },
+            {
+                category: "타인과의 비교",
+                scenario: "친한 친구가 새로운 사업으로 큰 성공을 거두었습니다.",
+                question: "친구의 성공 소식을 들었을 때 어떤 기분이 드나요?",
+                options: [
+                    { label: "A", text: "나 자신과 비교하며 초조해진다", score: 0 },
+                    { label: "B", text: "친구의 성공 비결이 궁금하고 배우고 싶다", score: 2 },
+                    { label: "C", text: "나만 뒤처지는 것 같은 느낌이 든다", score: 0 },
+                    { label: "D", text: "친구의 성공에 진심으로 기뻐하며 나도 영감을 받는다", score: 2 }
+                ]
+            },
+            {
+                category: "타인과의 비교",
+                scenario: "당신보다 경력이 짧은 동료가 더 좋은 아이디어를 냈습니다.",
+                question: "이 상황에서 어떻게 반응하나요?",
+                options: [
+                    { label: "A", text: "자존심이 상하고 기분이 좋지 않다", score: 0 },
+                    { label: "B", text: "그 아이디어의 좋은 점을 배우려고 한다", score: 2 },
+                    { label: "C", text: "내 능력이 부족한 것 같아 불안하다", score: 0 },
+                    { label: "D", text: "좋은 아이디어를 통해 팀 전체가 발전할 수 있어 긍정적이다", score: 2 }
+                ]
+            },
+            {
+                category: "노력과 과정",
+                scenario: "매우 어려운 과제에 많은 시간을 쏟았지만, 아직 결과가 보이지 않습니다.",
+                question: "결과가 보이지 않는 노력을 계속할 때 어떤 생각이 드나요?",
+                options: [
+                    { label: "A", text: "이 노력이 헛수고일 수 있다고 생각한다", score: 0 },
+                    { label: "B", text: "결과가 나오지 않더라도 과정에서 배우는 것이 많다고 생각한다", score: 2 },
+                    { label: "C", text: "결과를 내지 못하면 시간 낭비라고 느낀다", score: 0 },
+                    { label: "D", text: "꾸준히 노력하면 결국 돌파구를 찾을 수 있다고 믿는다", score: 2 }
+                ]
+            },
+            {
+                category: "노력과 과정",
+                scenario: "어떤 사람들은 특정 분야에 '타고난 재능'이 있다고 말합니다.",
+                question: "당신은 재능에 대해 어떻게 생각하나요?",
+                options: [
+                    { label: "A", text: "재능은 태어날 때부터 정해져 있다고 생각한다", score: 0 },
+                    { label: "B", text: "재능보다 꾸준한 노력이 더 중요하다고 생각한다", score: 2 },
+                    { label: "C", text: "재능이 없으면 아무리 노력해도 한계가 있다고 생각한다", score: 0 },
+                    { label: "D", text: "노력을 통해 재능을 개발하고 키울 수 있다고 믿는다", score: 2 }
+                ]
+            },
+            {
+                category: "노력과 과정",
+                scenario: "새로운 취미를 시작했지만 생각보다 실력이 늘지 않습니다.",
+                question: "실력 향상이 더딜 때 어떻게 반응하나요?",
+                options: [
+                    { label: "A", text: "나는 이 취미에 소질이 없다고 생각하며 쉽게 포기한다", score: 0 },
+                    { label: "B", text: "더 효과적인 연습 방법을 찾아보거나 조언을 구한다", score: 2 },
+                    { label: "C", text: "다른 사람들보다 못하는 것이 창피하게 느껴진다", score: 0 },
+                    { label: "D", text: "실력이 느는 과정 자체를 즐기려고 노력한다", score: 2 }
+                ]
+            },
+            {
+                category: "노력과 과정",
+                scenario: "지능이나 성격 같은 기본적인 능력은 변할 수 없다고 생각하나요?",
+                question: "사람의 근본적인 자질에 대한 당신의 생각은?",
+                options: [
+                    { label: "A", text: "사람은 잘 변하지 않는다고 생각한다", score: 0 },
+                    { label: "B", text: "경험과 노력을 통해 사람은 얼마든지 변할 수 있다고 생각한다", score: 2 },
+                    { label: "C", text: "바꾸려는 노력 자체가 힘들고 의미 없다고 느낀다", score: 0 },
+                    { label: "D", text: "스스로의 의지에 따라 자신의 역량을 크게 발전시킬 수 있다고 믿는다", score: 2 }
+                ]
+            }
+        ];
+
+        // 설문 시작 함수
+        function startSurvey() {
+            const nameInput = document.getElementById('participantName');
+            participantName = nameInput.value.trim();
+            
+            if (!participantName) {
+                alert('이름을 입력해주세요.');
+                return;
+            }
+            
+            document.getElementById('welcomeScreen').style.display = 'none';
+            document.getElementById('questionContainer').style.display = 'block';
+            // 강사용 버튼 숨기기
+            document.getElementById('instructorPanel').style.display = 'none';
+            currentQuestion = 0;
+            answers = [];
+            totalScore = 0;
+            showQuestion();
+        }
+
+        // 질문 표시 함수
+        function showQuestion() {
+            const question = questions[currentQuestion];
+            const questionElement = document.getElementById('questionElement');
+            
+            questionElement.innerHTML = `
+                <div class="question-header">
+                    <div class="question-number">질문 ${currentQuestion + 1} / ${questions.length} - ${question.category}</div>
+                    <div class="question-text">${question.question}</div>
+                    <div class="question-scenario">"${question.scenario}"</div>
+                </div>
+                <div class="options">
+                    ${question.options.map((option, index) => `
+                        <div class="option" onclick="selectOption(${index})">
+                            <div class="option-label">${option.label}</div>
+                            <div class="option-text">${option.text}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            // 진행률 업데이트
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+
+            // 버튼 상태 업데이트
+            document.getElementById('prevBtn').disabled = currentQuestion === 0;
+            document.getElementById('nextBtn').disabled = answers[currentQuestion] === undefined;
+            document.getElementById('nextBtn').textContent = currentQuestion === questions.length - 1 ? '결과 보기' : '다음';
+
+            // 이전에 선택한 답변이 있다면 표시
+            if (answers[currentQuestion] !== undefined) {
+                const options = document.querySelectorAll('.option');
+                options[answers[currentQuestion]].classList.add('selected');
+            }
+        }
+
+        // 옵션 선택 함수
+        function selectOption(optionIndex) {
+            // 이전 선택 제거
+            const options = document.querySelectorAll('.option');
+            options.forEach(option => option.classList.remove('selected'));
+            
+            // 새 선택 추가
+            options[optionIndex].classList.add('selected');
+            
+            // 답변 저장
+            answers[currentQuestion] = optionIndex;
+            
+            // 다음 버튼 활성화
+            document.getElementById('nextBtn').disabled = false;
+        }
+
+        // 이전 질문으로 이동
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                showQuestion();
+            }
+        }
+
+        // 다음 질문으로 이동
+        function nextQuestion() {
+            if (answers[currentQuestion] !== undefined) {
+                if (currentQuestion < questions.length - 1) {
+                    currentQuestion++;
+                    showQuestion();
+                } else {
+                    // 마지막 질문이면 결과 계산
+                    calculateResult();
+                }
+            }
+        }
+
+        // 결과 계산 함수
+        function calculateResult() {
+            totalScore = 0;
+            for (let i = 0; i < questions.length; i++) {
+                const selectedOption = answers[i];
+                totalScore += questions[i].options[selectedOption].score;
+            }
+
+            // 결과를 저장
+            const result = {
+                name: participantName,
+                score: totalScore,
+                maxScore: questions.length * 2,
+                percentage: Math.round((totalScore / (questions.length * 2)) * 100),
+                timestamp: new Date().toISOString(),
+                answers: answers
+            };
+            
+            allResults.push(result);
+            localStorage.setItem('surveyResults', JSON.stringify(allResults));
+
+            showResult();
+        }
+
+        // 결과 표시 함수
+        function showResult() {
+            document.getElementById('questionContainer').style.display = 'none';
+            document.getElementById('resultContainer').style.display = 'block';
+            // 강사용 버튼 다시 보이기
+            document.getElementById('instructorPanel').style.display = 'block';
+
+            // 개인 결과 분석
+            let category, description;
+            const maxScore = questions.length * 2;
+            const percentage = Math.round((totalScore / maxScore) * 100);
+
+            if (totalScore >= 30) {
+                category = "🌟 강한 성장 마인드셋";
+                description = `
+                    <h3>축하합니다! 당신은 강한 성장 마인드셋을 가지고 있습니다.</h3>
+                    <p>도전을 두려워하지 않고, 실패를 학습의 기회로 받아들이며, 지속적인 노력을 통해 성장할 수 있다고 믿습니다.</p>
+                    <div class="result-tips">
+                        <h4>💡 더 발전하기 위한 팁:</h4>
+                        <ul>
+                            <li>다른 사람들과 성장 마인드셋을 공유하고 격려하기</li>
+                            <li>더 큰 도전에 도전해보기</li>
+                            <li>멘토링을 통해 다른 사람의 성장 돕기</li>
+                        </ul>
+                    </div>
+                `;
+            } else if (totalScore >= 20) {
+                category = "📈 성장 마인드셋 경향";
+                description = `
+                    <h3>좋습니다! 당신은 성장 마인드셋을 지향하고 있습니다.</h3>
+                    <p>대부분의 상황에서 성장과 학습을 중시하지만, 때때로 고정된 사고에 빠질 수 있습니다.</p>
+                    <div class="result-tips">
+                        <h4>💡 성장 마인드셋 강화 팁:</h4>
+                        <ul>
+                            <li>실패나 어려움을 마주할 때 "아직은" 이라는 말 추가하기</li>
+                            <li>과정과 노력에 초점을 맞춘 자기 대화하기</li>
+                            <li>다양한 도전에 의도적으로 노출되기</li>
+                        </ul>
+                    </div>
+                `;
+            } else if (totalScore >= 10) {
+                category = "⚖️ 혼합형 마인드셋";
+                description = `
+                    <h3>당신은 상황에 따라 다른 마인드셋을 보입니다.</h3>
+                    <p>어떤 영역에서는 성장 지향적이지만, 다른 영역에서는 고정된 생각을 가질 수 있습니다.</p>
+                    <div class="result-tips">
+                        <h4>💡 균형 잡힌 마인드셋 개발 팁:</h4>
+                        <ul>
+                            <li>고정 마인드셋이 나타나는 특정 상황 파악하기</li>
+                            <li>"나는 할 수 없어" 대신 "아직 할 수 없어" 말하기</li>
+                            <li>작은 도전부터 시작해서 성공 경험 쌓기</li>
+                        </ul>
+                    </div>
+                `;
+            } else {
+                category = "🔒 고정 마인드셋 경향";
+                description = `
+                    <h3>현재 고정 마인드셋 경향을 보이고 있습니다.</h3>
+                    <p>능력이 고정되어 있다고 믿고, 실패를 개인적 한계로 해석하는 경향이 있습니다.</p>
+                    <div class="result-tips">
+                        <h4>💡 마인드셋 전환 시작 팁:</h4>
+                        <ul>
+                            <li>뇌과학에 대해 학습하기 (뇌의 가소성)</li>
+                            <li>성장 마인드셋을 가진 롤모델 찾기</li>
+                            <li>작은 학습 목표 설정하고 달성하기</li>
+                        </ul>
+                    </div>
+                `;
+            }
+
+            // 개인 결과 표시
+            document.getElementById('resultScore').textContent = `${totalScore}/${maxScore}점 (${percentage}%)`;
+            document.getElementById('resultCategory').textContent = category;
+            document.getElementById('resultDescription').innerHTML = description;
+
+            // 전체 집계 결과 표시
+            showAggregateResults();
+        }
+
+        // 전체 집계 결과 표시 함수
+        function showAggregateResults() {
+            if (allResults.length === 0) {
+                document.getElementById('totalParticipants').textContent = '0';
+                document.getElementById('averageScore').textContent = '0.0%';
+                if (document.getElementById('distributionBars')) document.getElementById('distributionBars').innerHTML = '';
+                return;
+            }
+            const totalParticipants = allResults.length;
+            const averageScore = allResults.reduce((sum, result) => sum + result.percentage, 0) / totalParticipants;
+            document.getElementById('totalParticipants').textContent = totalParticipants;
+            document.getElementById('averageScore').textContent = averageScore.toFixed(1) + '%';
+            createDistributionChart('distributionBars', allResults);
+        }
+
+        // 순위 계산 함수
+        function calculateRank(userScore, allResults) {
+            const userPercentage = Math.round((userScore / (questions.length * 2)) * 100);
+            const higherScores = allResults.filter(result => result.percentage > userPercentage).length;
+            return higherScores + 1;
+        }
+
+        // 분포 차트 생성 함수
+        function createDistributionChart(containerId, results) {
+            const categories = [
+                { name: '강한 성장', min: 75, max: 100, color: '#28a745' },
+                { name: '성장 경향', min: 50, max: 74, color: '#17a2b8' },
+                { name: '혼합형', min: 25, max: 49, color: '#ffc107' },
+                { name: '고정 경향', min: 0, max: 24, color: '#dc3545' }
+            ];
+
+            const distribution = categories.map(cat => {
+                const count = results.filter(r => r.percentage >= cat.min && r.percentage <= cat.max).length;
+                return { ...cat, count, percentage: results.length > 0 ? (count / results.length) * 100 : 0 };
+            });
+
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            distribution.forEach(item => {
+                const barContainer = document.createElement('div');
+                barContainer.className = 'chart-bar';
+
+                const label = document.createElement('div');
+                label.className = 'chart-label';
+                label.textContent = item.name;
+
+                const barFill = document.createElement('div');
+                barFill.className = 'chart-bar-fill';
+                barFill.style.width = `${item.percentage}%`;
+                barFill.style.background = item.color;
+
+                const value = document.createElement('div');
+                value.className = 'chart-value';
+                value.textContent = `${item.count}명`;
+
+                barContainer.appendChild(label);
+                barContainer.appendChild(barFill);
+                barContainer.appendChild(value);
+                container.appendChild(barContainer);
+            });
+        }
+
+        // 강사용 모달 토글 함수
+        function toggleInstructorModal() {
+            const modal = document.getElementById('instructorModal');
+            if (modal.style.display === 'block') {
+                modal.style.display = 'none';
+            } else {
+                modal.style.display = 'block';
+                updateInstructorDashboard();
+            }
+        }
+
+        // 강사용 대시보드 업데이트
+        function updateInstructorDashboard() {
+            if (allResults.length === 0) {
+                document.getElementById('modalTotalParticipants').textContent = '0';
+                document.getElementById('modalAverageScore').textContent = '0.0%';
+                document.getElementById('modalHighestScore').textContent = '0%';
+                document.getElementById('modalLowestScore').textContent = '0%';
+                if (document.getElementById('modalDistributionBars')) document.getElementById('modalDistributionBars').innerHTML = '';
+                if (document.getElementById('participantResults')) document.getElementById('participantResults').innerHTML = '';
+                return;
+            }
+            const totalParticipants = allResults.length;
+            const averageScore = allResults.reduce((sum, result) => sum + result.percentage, 0) / totalParticipants;
+            const highestScore = Math.max(...allResults.map(r => r.percentage));
+            const lowestScore = Math.min(...allResults.map(r => r.percentage));
+            document.getElementById('modalTotalParticipants').textContent = totalParticipants;
+            document.getElementById('modalAverageScore').textContent = averageScore.toFixed(1) + '%';
+            document.getElementById('modalHighestScore').textContent = highestScore + '%';
+            document.getElementById('modalLowestScore').textContent = lowestScore + '%';
+            createDistributionChart('modalDistributionBars', allResults);
+            updateParticipantList();
+        }
+
+        // 참가자 목록 업데이트
+        function updateParticipantList() {
+            const container = document.getElementById('participantResults');
+            container.innerHTML = '';
+
+            // 점수 순으로 정렬
+            const sortedResults = [...allResults].sort((a, b) => b.percentage - a.percentage);
+
+            sortedResults.forEach((result, index) => {
+                const item = document.createElement('div');
+                item.className = 'participant-item';
+
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'participant-name';
+                nameDiv.textContent = `${index + 1}. ${result.name}`;
+
+                const scoreDiv = document.createElement('div');
+                scoreDiv.innerHTML = `
+                    <span class="participant-score">${result.percentage}%</span>
+                    <div class="participant-level">${getCategoryByScore(result.percentage)}</div>
+                `;
+
+                item.appendChild(nameDiv);
+                item.appendChild(scoreDiv);
+                container.appendChild(item);
+            });
+        }
+
+        // 점수에 따른 카테고리 반환
+        function getCategoryByScore(percentage) {
+            if (percentage >= 75) return '강한 성장 마인드셋';
+            if (percentage >= 50) return '성장 마인드셋 경향';
+            if (percentage >= 25) return '혼합형 마인드셋';
+            return '고정 마인드셋 경향';
+        }
+
+        // 결과 내보내기 함수
+        function exportResults() {
+            const csvContent = generateCSV(allResults);
+            downloadCSV(csvContent, 'mindset_survey_results.csv');
+        }
+
+        // CSV 생성 함수
+        function generateCSV(results) {
+            const headers = ['순위', '이름', '점수', '백분율', '카테고리', '완료시간'];
+            const sortedResults = [...results].sort((a, b) => b.percentage - a.percentage);
+            
+            let csvContent = headers.join(',') + '\n';
+            
+            sortedResults.forEach((result, index) => {
+                const row = [
+                    index + 1,
+                    `"${result.name}"`,
+                    `${result.score}/${result.maxScore}`,
+                    `${result.percentage}%`,
+                    `"${getCategoryByScore(result.percentage)}"`,
+                    new Date(result.timestamp).toLocaleString()
+                ];
+                csvContent += row.join(',') + '\n';
+            });
+            
+            return csvContent;
+        }
+
+        // CSV 다운로드 함수
+        function downloadCSV(csvContent, filename) {
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // 모든 데이터 삭제 함수
+        function clearAllData() {
+            if (confirm('모든 설문 데이터를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+                localStorage.removeItem('surveyResults');
+                allResults = [];
+                // 강사용 대시보드, 결과 화면 모두 즉시 0으로 갱신
+                updateInstructorDashboard();
+                showAggregateResults();
+                // 결과 화면의 개별 결과, 분포, 점수 등도 즉시 초기화
+                if (document.getElementById('resultScore')) document.getElementById('resultScore').textContent = '-';
+                if (document.getElementById('resultCategory')) document.getElementById('resultCategory').textContent = '';
+                if (document.getElementById('resultDescription')) document.getElementById('resultDescription').innerHTML = '';
+                if (document.getElementById('distributionBars')) document.getElementById('distributionBars').innerHTML = '';
+                if (document.getElementById('totalParticipants')) document.getElementById('totalParticipants').textContent = '0';
+                if (document.getElementById('averageScore')) document.getElementById('averageScore').textContent = '0.0%';
+                alert('모든 데이터가 삭제되었습니다.');
+            }
+        }
+
+        // 설문 재시작 함수
+        function restartSurvey() {
+            document.getElementById('resultContainer').style.display = 'none';
+            document.getElementById('welcomeScreen').style.display = 'block';
+            // 강사용 버튼 다시 보이기
+            document.getElementById('instructorPanel').style.display = 'block';
+            currentQuestion = 0;
+            answers = [];
+            totalScore = 0;
+            document.getElementById('participantName').value = '';
+        }
+    </script>
+</body>
+</html>
